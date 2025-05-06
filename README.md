@@ -1,1 +1,1 @@
-# WypozyczalniaPlytOrazAlbumow
+Wypożyczalnia Płyt

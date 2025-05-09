@@ -96,3 +96,5 @@ Administrator może:
 - `discs`: id, name, artist_id, genre, year avaible 
 - `artist`: id, name, surname
 - `rentals`: id, user_id, disc_id, rented_at, returned_at 
+
+## PROJEKT MOŻE MIEĆ ZMIENIONE ZAŁOŻENIA PODCZAS ROBIENIA

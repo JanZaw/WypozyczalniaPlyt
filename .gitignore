@@ -1,0 +1,4 @@
+../WypozyczalniaPlyt/venv
+venv/
+venv/*
+.idea

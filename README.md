@@ -93,7 +93,7 @@ Administrator może:
 ## 5. Baza danych (prosto)
 
 - `users`: id, username ,email, password, role  
-- `discs`: id, name, artist_id, genre, year avaible 
+- `discs`: id, name, artist_id, genre, year, avaible 
 - `artist`: id, name, surname
 - `rentals`: id, user_id, disc_id, rented_at, returned_at 
 

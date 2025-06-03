@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, status
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from mongoengine import connect
 from pydantic import BaseModel
-from typing import Optional, List
-from datetime import datetime, timedelta
+from typing import Optional
+from datetime import timedelta
 import jwt
 from model import *
 
 SECRET = "SECRET_KEY"
 
-connect(db="music_rental", host="mongodb://localhost:27018/music_rental")
+connect(db="music_rental", host="mongodb://mongodb:27017/music_rental")
+
 app = FastAPI()
 active_connections: dict[str, WebSocket] = {}
 
@@ -28,7 +29,7 @@ class RentalResponse(BaseModel):
     rented_at: datetime
     returned_at: Optional[datetime]
 
-# ======================================================
+# ================================
 
 def create_access_token(data: dict):
     expire = datetime.utcnow() + timedelta(minutes=60)
@@ -52,7 +53,7 @@ def get_current_user(token: str):
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-# =======================================================
+# ================================
 
 @app.post("/register")
 def register(data: UserRequest):
@@ -69,13 +70,13 @@ def login(data: UserRequest):
     token = create_access_token({"sub": user.username})
     return {"token": token}
 
-# ===========================================================
+# ================================
 
 @app.post("/admin/add_album")
 def add_album(title: str, artist: str, token: str):
     user = get_current_user(token)
     if not user.is_admin:
-        raise HTTPException(status_code=403)
+        raise HTTPException(status_code=403, detail="Not admin")
     Album(title=title, artist=artist).save()
     return {"msg": "Album added"}
 
@@ -83,14 +84,14 @@ def add_album(title: str, artist: str, token: str):
 def remove_album(album_id: str, token: str):
     user = get_current_user(token)
     if not user.is_admin:
-        raise HTTPException(status_code=403)
+        raise HTTPException(status_code=403, detail="Not admin")
     Album.objects(id=album_id).delete()
     return {"msg": "Album deleted"}
 
-# ===========================================================
+# ================================
 
 @app.get("/albums")
-def list_albums(artist: str = None):
+def list_albums(artist: Optional[str] = None):
     if artist:
         return list(Album.objects(artist=artist))
     return list(Album.objects())
@@ -124,6 +125,7 @@ def rental_history(token: str):
     user = get_current_user(token)
     return list(Rental.objects(user=user))
 
+# ================================
 
 @app.websocket("/ws/{token}")
 async def websocket_endpoint(websocket: WebSocket, token: str):
@@ -131,8 +133,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str):
         username = verify_token(token)
         await websocket.accept()
         active_connections[username] = websocket
-
         while True:
-            await websocket.receive_text()  # Ping-pong
+            await websocket.receive_text()
     except WebSocketDisconnect:
         active_connections.pop(username, None)

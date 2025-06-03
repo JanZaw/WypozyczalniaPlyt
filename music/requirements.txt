@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+mongoengine
+pydantic
+python-jose
+PyJWT

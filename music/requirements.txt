@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-mongoengine
+sqlalchemy
 pydantic
-python-jose
-PyJWT
+python-jose[cryptography]
+passlib[bcrypt]
